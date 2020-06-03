@@ -113,7 +113,8 @@ class AffineLayer(LayerWithParameters):
         Returns:
             outputs: Array of layer outputs of shape (batch_size, output_dim).
         """
-        raise NotImplementedError()
+        outputs = inputs.dot(self.weights.T) + self.biases
+        return outputs
 
     def grads_wrt_params(self, inputs, grads_wrt_outputs):
         """Calculates gradients with respect to layer parameters.
@@ -127,7 +128,11 @@ class AffineLayer(LayerWithParameters):
             list of arrays of gradients with respect to the layer parameters
             `[grads_wrt_weights, grads_wrt_biases]`.
         """
-        raise NotImplementedError()
+        # grads_wrt_weights have shape (output_dim, input_dim)
+        grads_wrt_weights = grads_wrt_outputs.T.dot(inputs)
+        # grads_wrt_biases have shape  (output_dim,)
+        grads_wrt_biases = grads_wrt_outputs.T.dot(np.ones(grads_wrt_outputs.shape[0]))
+        return grads_wrt_weights, grads_wrt_biases
 
     @property
     def params(self):
